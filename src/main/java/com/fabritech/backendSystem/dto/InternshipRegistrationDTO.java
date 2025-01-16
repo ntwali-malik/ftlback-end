@@ -9,6 +9,7 @@ public class InternshipRegistrationDTO {
     private String program;
     private String education;
     private LocalDate startDate;
+    private String status;
 
     // Getters and Setters
     public String getFullName() {
@@ -57,5 +58,13 @@ public class InternshipRegistrationDTO {
 
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

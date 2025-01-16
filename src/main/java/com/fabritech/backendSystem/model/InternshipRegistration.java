@@ -1,7 +1,6 @@
 package com.fabritech.backendSystem.model;
 
 import java.time.LocalDate;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -29,6 +28,9 @@ public class InternshipRegistration {
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
+
+    @Column(name = "status", nullable = false)
+    private String status = "Pending"; // Default value
 
     // Getters and Setters
     public Long getId() {
@@ -85,5 +87,13 @@ public class InternshipRegistration {
 
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

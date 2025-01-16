@@ -1,19 +1,27 @@
 package com.fabritech.backendSystem.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
 public class DecoderOrder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	 @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    private Long id;
 
-    private String decoderType; // Canal+ or DStv
-    private String installationType; // New or Replacement
-    private String name;
-    private String phoneNumber;
-    private String email;
-    private String location;
+	    private String decoderType;
+	    private String installationType;
+	    private String name;
+	    private String phoneNumber;
+	    private String email;
+	    private String location;
+	    
+	    @Column(nullable = false)
+	    private String status = "Pending"; // Default value
+	    
+	    @Column(nullable = false)
+	    private LocalDateTime createdAt = LocalDateTime.now();
 	public Long getId() {
 		return id;
 	}
@@ -56,6 +64,20 @@ public class DecoderOrder {
 	public void setLocation(String location) {
 		this.location = location;
 	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+	
+	
     
     
 }

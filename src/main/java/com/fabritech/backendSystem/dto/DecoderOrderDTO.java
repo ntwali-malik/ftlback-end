@@ -7,6 +7,7 @@ public class DecoderOrderDTO {
     private String phoneNumber;
     private String email;
     private String location;
+    private String status;
 	public String getDecoderType() {
 		return decoderType;
 	}
@@ -43,6 +44,14 @@ public class DecoderOrderDTO {
 	public void setLocation(String location) {
 		this.location = location;
 	}
+	
+	public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
     
     
 }

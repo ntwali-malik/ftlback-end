@@ -31,10 +31,54 @@ public class InternshipRegistrationController {
         registration.setProgram(dto.getProgram());
         registration.setEducation(dto.getEducation());
         registration.setStartDate(dto.getStartDate());
+        registration.setStatus("Pending"); // Set default status
 
         repository.save(registration);
 
-        // Create a plain text email template
+        // Send confirmation email
+        sendConfirmationEmail(registration);
+
+        return ResponseEntity.ok("Internship registration successful and confirmation email sent");
+    }
+
+    @GetMapping
+    public List<InternshipRegistration> getAllRegistrations() {
+        return repository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<InternshipRegistration> getRegistrationById(@PathVariable Long id) {
+        return repository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteRegistration(@PathVariable Long id) {
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+            return ResponseEntity.ok("Internship registration deleted successfully");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<String> updateStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest status) {
+        return repository.findById(id)
+                .map(registration -> {
+                    registration.setStatus(status.getStatus());
+                    repository.save(registration);
+                    
+                    // Send status update email
+                    sendStatusUpdateEmail(registration);
+                    
+                    return ResponseEntity.ok("Status updated successfully");
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    private void sendConfirmationEmail(InternshipRegistration registration) {
         String subject = "Welcome to Fabritech Internship Program";
         String body = String.format("""
             Dear %s,
@@ -83,34 +127,101 @@ public class InternshipRegistrationController {
             registration.getEducation()
         );
 
-        // Send plain text email
         emailService.sendEmail(registration.getEmail(), subject, body);
-
-        return ResponseEntity.ok("Internship registration successful and confirmation email sent");
     }
 
-    // Get all internship registrations
-    @GetMapping
-    public List<InternshipRegistration> getAllRegistrations() {
-        return repository.findAll();
-    }
+    private void sendStatusUpdateEmail(InternshipRegistration registration) {
+        String subject = "Fabritech Internship Application Update";
+        String body;
 
-    // Get an internship registration by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<InternshipRegistration> getRegistrationById(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+        if ("Approved".equals(registration.getStatus())) {
+            body = String.format("""
+                Dear %s,
 
-    // Delete an internship registration by ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRegistration(@PathVariable Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            return ResponseEntity.ok("Internship registration deleted successfully");
+                Congratulations! Your application for the Fabritech Internship Program has been APPROVED.
+
+                INTERNSHIP DETAILS:
+                ==================
+                Program: %s
+                Start Date: %s
+                
+                NEXT STEPS:
+                ===========
+                1. Orientation Session: You will be contacted shortly with orientation details
+                2. Start Date: %s
+                3. Location: YYUSSA Plaza, Kisimenti, Remera
+
+                IMPORTANT REQUIREMENTS:
+                =====================
+                - Please arrive 15 minutes early on your first day
+                - Bring a valid ID
+                - Dress code: Business casual
+                - Bring your laptop (if you have one)
+
+                If you have any questions, please contact us:
+                Email: info@fabritech.rw
+                Phone: +250788601280
+
+                Welcome to the Fabritech team!
+
+                Best regards,
+                The Fabritech Team
+                """,
+                registration.getFullName(),
+                registration.getProgram(),
+                registration.getStartDate(),
+                registration.getStartDate()
+            );
+        } else if ("Rejected".equals(registration.getStatus())) {
+            body = String.format("""
+                Dear %s,
+
+                Thank you for your interest in the Fabritech Internship Program.
+
+                After careful consideration of your application, we regret to inform you that we are unable to offer you an internship position at this time.
+
+                We encourage you to:
+                - Continue developing your skills
+                - Apply for future opportunities
+                - Keep following our company for future openings
+
+                We wish you the best in your future endeavors.
+
+                Best regards,
+                The Fabritech Team
+                """,
+                registration.getFullName()
+            );
         } else {
-            return ResponseEntity.notFound().build();
+            body = String.format("""
+                Dear %s,
+
+                Your internship application status has been updated to: %s
+
+                If you have any questions, please contact us:
+                Email: info@fabritech.rw
+                Phone: +250788601280
+
+                Best regards,
+                The Fabritech Team
+                """,
+                registration.getFullName(),
+                registration.getStatus()
+            );
         }
+
+        emailService.sendEmail(registration.getEmail(), subject, body);
     }
 }
+
+//class StatusUpdateRequest {
+//    private String status;
+//
+//    public String getStatus() {
+//        return status;
+//    }
+//
+//    public void setStatus(String status) {
+//        this.status = status;
+//    }
+//}

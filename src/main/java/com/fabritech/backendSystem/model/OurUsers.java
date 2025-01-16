@@ -21,11 +21,9 @@ public class OurUsers {
 
     @Column
     private String city;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role")
-    private Set<String> roles;
+    
+    @Column
+    private String roles;
 
     // Getters and Setters
     public Integer getId() {
@@ -68,11 +66,11 @@ public class OurUsers {
         this.city = city;
     }
 
-    public Set<String> getRoles() {
+    public String getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<String> roles) {
+    public void setRoles(String roles) {
         this.roles = roles;
     }
 }
